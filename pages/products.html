@@ -1,0 +1,131 @@
+<!-- Product Management Page View -->
+<div class="space-y-5">
+
+    <!-- Page Title & Action Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+            <h2 class="font-display font-bold text-2xl text-slate-900">Product Management</h2>
+            <p class="text-xs text-slate-500">Manage cake items, product codes, and standard retail pricing</p>
+        </div>
+        <div class="flex items-center gap-2.5 self-start sm:self-auto">
+            <div class="text-xs text-slate-500 font-semibold bg-white border border-slate-200 px-3 py-2 rounded-xl shadow-xs">
+                Total Products: <span id="totalProductsCountBadge" class="text-rose-600 font-bold">0</span>
+            </div>
+            <button type="button" id="addNewProductBtn"
+                class="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl shadow-sm transition">
+                <i class="fa-solid fa-plus text-[11px]"></i>
+                <span>Add Product</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Search & Filter Toolbar Card -->
+    <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="relative w-full sm:w-96">
+            <span class="absolute left-3.5 top-2.5 text-slate-400 text-xs">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </span>
+            <input type="text" id="productSearchInput"
+                class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-200"
+                placeholder="Search by Product Name or Code (e.g. CK-001)...">
+        </div>
+        <div class="text-xs text-slate-400 font-medium">
+            Live database catalog &bull; Auto-syncs with Billing
+        </div>
+    </div>
+
+    <!-- Products Table Card -->
+    <div class="bg-white rounded-2xl shadow-xs border border-slate-200/80 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                    <tr class="bg-slate-100/80 text-slate-500 uppercase font-semibold text-[11px] border-b border-slate-200">
+                        <th class="py-3.5 px-4 text-center w-16">#</th>
+                        <th class="py-3.5 px-4">Code</th>
+                        <th class="py-3.5 px-4">Product / Cake Name</th>
+                        <th class="py-3.5 px-4 text-right">Price (₹)</th>
+                        <th class="py-3.5 px-4 text-center">Created At</th>
+                        <th class="py-3.5 px-4 text-center w-28">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="productsTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium">
+                    <!-- Dynamic Product Rows -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Add / Edit Product Modal -->
+<div id="productModal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 transform transition-all">
+
+        <!-- Modal Header -->
+        <div class="bg-slate-900 text-white p-5 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <span class="w-8 h-8 rounded-lg bg-rose-500 text-white flex items-center justify-center font-bold text-sm">
+                    <i class="fa-solid fa-cake-candles"></i>
+                </span>
+                <div>
+                    <h3 class="font-display font-bold text-base" id="productModalTitle">Add New Product</h3>
+                    <p class="text-[11px] text-slate-400">Enter product details to save into catalog</p>
+                </div>
+            </div>
+            <button type="button" id="closeProductModalBtn"
+                class="text-slate-400 hover:text-white text-lg w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-800 transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Modal Form Body -->
+        <form id="productForm" class="p-5 space-y-4 text-xs" novalidate>
+            <input type="hidden" id="prodId" value="">
+
+            <!-- Product Code -->
+            <div>
+                <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Product Code</label>
+                <input type="text" id="prodCode"
+                    class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-rose-500 font-mono uppercase font-bold"
+                    placeholder="e.g. CK-009 (Leave empty to auto-generate)">
+                <p class="text-[10px] text-slate-400 mt-1">Unique barcode/SKU code identifier.</p>
+            </div>
+
+            <!-- Product Name -->
+            <div>
+                <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Cake / Item Name *</label>
+                <input type="text" id="prodName"
+                    class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-rose-500 font-semibold"
+                    placeholder="e.g. Strawberry Shortcake (1 Kg)" required>
+                <span id="prodNameErr" class="text-[11px] text-red-500 hidden mt-0.5">Product Name is required</span>
+            </div>
+
+            <!-- Product Price -->
+            <div>
+                <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Price (₹) *</label>
+                <div class="relative">
+                    <span class="absolute left-3 top-2 text-slate-400 font-medium">₹</span>
+                    <input type="number" id="prodPrice" min="0" step="0.01"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg pl-7 pr-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-rose-500 font-semibold"
+                        placeholder="0.00" required>
+                </div>
+                <span id="prodPriceErr" class="text-[11px] text-red-500 hidden mt-0.5">Valid Price greater than 0 is required</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                <button type="button" id="cancelProductModalBtn"
+                    class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-xs rounded-xl transition">
+                    Cancel
+                </button>
+                <button type="submit" id="saveProductSubmitBtn"
+                    class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>Save Product</span>
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>

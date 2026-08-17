@@ -1,7 +1,7 @@
 /**
  * app.js
  * Main Dashboard Application Controller
- * Handles SPA page loading, sidebar navigation, mobile toggle, and toasts.
+ * Handles SPA page loading, sidebar navigation, mobile toggle, and toasts with live Core PHP backend.
  */
 
 window.CakeApp = (function () {
@@ -11,7 +11,9 @@ window.CakeApp = (function () {
     const pageTitleMap = {
         'dashboard': 'Dashboard',
         'billing': 'Billing System',
-        'orders': 'Order Management'
+        'orders': 'Order Management',
+        'products': 'Product Management',
+        'settings': 'General Settings'
     };
 
     function showToast(message, type = 'success') {
@@ -32,7 +34,7 @@ window.CakeApp = (function () {
     }
 
     function loadPage(pageName) {
-        if (!['dashboard', 'billing', 'orders'].includes(pageName)) {
+        if (!['dashboard', 'billing', 'orders', 'products', 'settings'].includes(pageName)) {
             pageName = 'dashboard';
         }
 
@@ -64,6 +66,10 @@ window.CakeApp = (function () {
                     window.CakeBilling.init();
                 } else if (pageName === 'orders' && window.CakeOrders) {
                     window.CakeOrders.init();
+                } else if (pageName === 'products' && window.CakeProducts) {
+                    window.CakeProducts.init();
+                } else if (pageName === 'settings' && window.CakeSettings) {
+                    window.CakeSettings.init();
                 }
 
                 // Close mobile sidebar after navigating
@@ -77,7 +83,7 @@ window.CakeApp = (function () {
                     <div class="p-8 text-center text-red-500 bg-red-50 rounded-2xl border border-red-200">
                         <i class="fa-solid fa-triangle-exclamation text-3xl mb-2"></i>
                         <h3 class="font-bold text-lg">Error Loading Page</h3>
-                        <p class="text-xs text-slate-600 mt-1">Unable to load pages/${pageName}.html. Please verify browser permissions.</p>
+                        <p class="text-xs text-slate-600 mt-1">Unable to load pages/${pageName}.html. Please verify server permissions.</p>
                     </div>
                 `).removeClass('opacity-50');
             }
@@ -94,9 +100,10 @@ window.CakeApp = (function () {
         $('#sidebarBackdrop').addClass('hidden');
     }
 
-    function init() {
-        // Guard check auth session
-        if (!CakeAuth.checkAuth()) return;
+    async function init() {
+        // Guard check auth session with server
+        const isAuthenticated = await CakeAuth.checkAuth();
+        if (!isAuthenticated) return;
 
         // Update logged in user name display
         $('#loggedInUserDisplay').text(CakeAuth.getUsername());
@@ -116,10 +123,10 @@ window.CakeApp = (function () {
         });
 
         // Logout Click
-        $('#logoutBtn').click(function (e) {
+        $('#logoutBtn').click(async function (e) {
             e.preventDefault();
             if (confirm('Are you sure you want to log out?')) {
-                CakeAuth.logout();
+                await CakeAuth.logout();
             }
         });
 

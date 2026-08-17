@@ -1,0 +1,142 @@
+<!-- General Settings Page View -->
+<div class="max-w-4xl space-y-6">
+
+    <!-- Page Title & Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+            <h2 class="font-display font-bold text-2xl text-slate-900">General Settings</h2>
+            <p class="text-xs text-slate-500">Configure store branding, contact information, and invoice preferences</p>
+        </div>
+    </div>
+
+    <!-- Settings Form -->
+    <form id="settingsForm" class="space-y-6" novalidate>
+
+        <!-- Section 1: Store Branding & Identity -->
+        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
+            <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+                <span class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-sm">
+                    <i class="fa-solid fa-store"></i>
+                </span>
+                <div>
+                    <h3 class="font-display font-bold text-sm text-slate-800">Store Identity & Branding</h3>
+                    <p class="text-[11px] text-slate-400">Display name and branding across headers, bills, and receipts</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+                <div class="md:col-span-1">
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Shop / Brand Name *</label>
+                    <input type="text" id="setting_site_name" name="site_name"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-rose-500 font-bold"
+                        placeholder="e.g. Cakino" required>
+                </div>
+
+                <div class="md:col-span-1">
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Tagline / Slogan</label>
+                    <input type="text" id="setting_tagline" name="tagline"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-rose-500 font-medium"
+                        placeholder="e.g. The Cake Art">
+                </div>
+
+                <div class="md:col-span-1">
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Currency Symbol</label>
+                    <input type="text" id="setting_currency_symbol" name="currency_symbol"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-rose-500 font-bold"
+                        placeholder="e.g. ₹" value="₹">
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Store Contact Information -->
+        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
+            <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+                <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm">
+                    <i class="fa-solid fa-address-book"></i>
+                </span>
+                <div>
+                    <h3 class="font-display font-bold text-sm text-slate-800">Contact & Location</h3>
+                    <p class="text-[11px] text-slate-400">Printed on invoice top headers and customer receipts</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Contact Phone</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2.5 text-slate-400 text-xs"><i class="fa-solid fa-phone"></i></span>
+                        <input type="text" id="setting_phone" name="phone"
+                            class="w-full bg-slate-50 border border-slate-300 rounded-lg pl-8 pr-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-rose-500 font-mono"
+                            placeholder="e.g. +91 093301 21219">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Contact Email</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2.5 text-slate-400 text-xs"><i class="fa-solid fa-envelope"></i></span>
+                        <input type="email" id="setting_email" name="email"
+                            class="w-full bg-slate-50 border border-slate-300 rounded-lg pl-8 pr-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-rose-500"
+                            placeholder="e.g. info@cakeshop.com">
+                    </div>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Full Shop Address</label>
+                    <textarea id="setting_address" name="address" rows="2"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-rose-500"
+                        placeholder="e.g. Hirdaypur station road hirdaypur, Madhyamgram, Kolkata, West Bengal 700127"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Invoicing & Receipt Policy -->
+        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
+            <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+                <span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-sm">
+                    <i class="fa-solid fa-receipt"></i>
+                </span>
+                <div>
+                    <h3 class="font-display font-bold text-sm text-slate-800">Invoicing & Tax Preferences</h3>
+                    <p class="text-[11px] text-slate-400">Default tax rates and thermal slip footer notes</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+                <div class="md:col-span-1">
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Default GST / Tax Rate (%)</label>
+                    <select id="setting_tax_rate" name="tax_rate"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-rose-500 font-semibold">
+                        <option value="0">0% (Tax Exempt)</option>
+                        <option value="5">5% (Standard Bakery GST)</option>
+                        <option value="12">12%</option>
+                        <option value="18">18%</option>
+                    </select>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Thermal Receipt Footer Message</label>
+                    <input type="text" id="setting_receipt_footer" name="receipt_footer"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-rose-500"
+                        placeholder="e.g. Freshly baked with love. Goods once sold cannot be returned. Thank You!">
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Submit Buttons -->
+        <div class="flex items-center justify-end gap-3 pt-2">
+            <button type="button" id="reloadSettingsBtn"
+                class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition flex items-center gap-1.5">
+                <i class="fa-solid fa-rotate-right text-[11px]"></i>
+                <span>Reset Form</span>
+            </button>
+            <button type="submit" id="saveSettingsBtn"
+                class="px-6 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>Save All Settings</span>
+            </button>
+        </div>
+
+    </form>
+
+</div>

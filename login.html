@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cakino Login</title>
+    <title>Cakino - Staff Login</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,7 +25,8 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
 
-    <!-- Auth JS -->
+    <!-- API & Auth JS -->
+    <script src="assets/js/api.js"></script>
     <script src="assets/js/auth.js"></script>
 </head>
 
@@ -46,7 +47,7 @@
             </div>
 
             <h1 class="font-display font-bold text-2xl tracking-tight">Cakino</h1>
-            <p class="text-xs text-rose-100 mt-1 font-medium">The Cake Art</p>
+            <p class="text-xs text-rose-100 mt-1 font-medium">The Cake Art - POS Portal</p>
         </div>
 
         <!-- Login Form Area -->
@@ -68,7 +69,7 @@
                                 class="fa-solid fa-user"></i></span>
                         <input type="text" id="username"
                             class="w-full bg-slate-50 border border-slate-300 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-200 font-medium"
-                            placeholder="Enter username (admin)">
+                            placeholder="Enter username (admin)" autocomplete="username" required>
                     </div>
                     <span id="usernameErr" class="text-[11px] text-red-500 hidden mt-0.5">Username is required</span>
                 </div>
@@ -81,7 +82,7 @@
                                 class="fa-solid fa-lock"></i></span>
                         <input type="password" id="password"
                             class="w-full bg-slate-50 border border-slate-300 rounded-lg pl-9 pr-10 py-2 text-xs text-slate-800 focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-200 font-medium"
-                            placeholder="Enter password (admin123)">
+                            placeholder="Enter password (admin123)" autocomplete="current-password" required>
                         <button type="button" id="togglePassword"
                             class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs focus:outline-none">
                             <i class="fa-solid fa-eye" id="eyeIcon"></i>
@@ -90,18 +91,9 @@
                     <span id="passwordErr" class="text-[11px] text-red-500 hidden mt-0.5">Password is required</span>
                 </div>
 
-                <!-- Remember Me & Predefined Notice -->
-                <div class="flex items-center justify-between text-xs pt-1">
-                    <label class="flex items-center gap-2 text-slate-600 cursor-pointer select-none">
-                        <input type="checkbox" id="rememberMe"
-                            class="rounded border-slate-300 text-rose-600 focus:ring-rose-500">
-                        <span>Remember Me</span>
-                    </label>
-                </div>
-
                 <!-- Submit Button -->
                 <div class="pt-2">
-                    <button type="submit"
+                    <button type="submit" id="submitLoginBtn"
                         class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
                         <span>Sign In to Dashboard</span>
                         <i class="fa-solid fa-arrow-right text-xs"></i>
@@ -109,17 +101,6 @@
                 </div>
 
             </form>
-
-            <!-- Predefined Credentials Helper Card -->
-            <!-- <div class="mt-6 p-3 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-600">
-                <div class="font-bold text-slate-800 flex items-center gap-1.5 mb-1">
-                    <i class="fa-solid fa-key text-rose-500"></i> Demo Credentials
-                </div>
-                <div class="grid grid-cols-2 gap-1 text-[11px] font-mono">
-                    <div>User: <span class="font-bold text-slate-900">admin</span></div>
-                    <div>Pass: <span class="font-bold text-slate-900">admin123</span></div>
-                </div>
-            </div> -->
 
         </div>
 
@@ -146,8 +127,8 @@
                 }
             });
 
-            // Form Submit with Validation
-            $('#loginForm').submit(function (e) {
+            // Form Submit with Async Live Validation
+            $('#loginForm').submit(async function (e) {
                 e.preventDefault();
 
                 const username = $('#username').val().trim();
@@ -171,14 +152,23 @@
 
                 if (!isValid) return;
 
-                // Authenticate
-                const res = CakeAuth.login(username, password);
+                const submitBtn = $('#submitLoginBtn');
+                submitBtn.prop('disabled', true).addClass('opacity-50');
 
-                if (res.success) {
-                    window.location.href = 'index.html';
-                } else {
-                    $('#alertMessage').text(res.message);
+                try {
+                    const res = await CakeAuth.login(username, password);
+
+                    if (res.success) {
+                        window.location.href = 'index.html';
+                    } else {
+                        $('#alertMessage').text(res.message || 'Invalid username or password!');
+                        $('#alertBox').removeClass('hidden');
+                    }
+                } catch (err) {
+                    $('#alertMessage').text('Connection error. Please try again.');
                     $('#alertBox').removeClass('hidden');
+                } finally {
+                    submitBtn.prop('disabled', false).removeClass('opacity-50');
                 }
             });
 

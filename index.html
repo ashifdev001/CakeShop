@@ -70,6 +70,18 @@
                     <i class="fa-solid fa-receipt w-4 text-center"></i>
                     <span>Billing System</span>
                 </a>
+
+                <a href="#products" data-page="products"
+                    class="nav-link flex items-center gap-3 px-3.5 py-3 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white font-semibold">
+                    <i class="fa-solid fa-boxes-stacked w-4 text-center"></i>
+                    <span>Products</span>
+                </a>
+
+                <a href="#settings" data-page="settings"
+                    class="nav-link flex items-center gap-3 px-3.5 py-3 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white font-semibold">
+                    <i class="fa-solid fa-gear w-4 text-center"></i>
+                    <span>Settings</span>
+                </a>
             </nav>
         </div>
 
@@ -112,10 +124,7 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <div class="text-xs text-slate-500 hidden sm:block">
-                    Status: <span class="inline-flex items-center gap-1 font-semibold text-emerald-600"><span
-                            class="w-2 h-2 rounded-full bg-emerald-500"></span> Online</span>
-                </div>
+                <!-- Top header action icons/controls if needed -->
             </div>
         </header>
 
@@ -133,12 +142,14 @@
         <span id="toastMessage">Action completed successfully.</span>
     </div>
 
-    <!-- Application JavaScript Bundles -->
+    <!-- Application JavaScript Bundles (100% Live Core PHP API) -->
+    <script src="assets/js/api.js"></script>
     <script src="assets/js/auth.js"></script>
-    <script src="assets/js/storage.js"></script>
     <script src="assets/js/dashboard.js"></script>
     <script src="assets/js/billing.js"></script>
     <script src="assets/js/orders.js"></script>
+    <script src="assets/js/products.js"></script>
+    <script src="assets/js/settings.js"></script>
     <script src="assets/js/app.js"></script>
 </body>
 

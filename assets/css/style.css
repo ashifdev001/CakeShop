@@ -40,31 +40,153 @@ body {
     pointer-events: none;
 }
 
-/* Print Styling */
+/* Thermal Slip Receipt (Screen default: hidden) */
+#thermalReceiptContainer {
+    display: none;
+}
+
+/* Print Styling for Thermal Slip Receipt */
 @media print {
-    .no-print {
+    @page {
+        size: auto;
+        margin: 0;
+    }
+
+    html, body {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        display: block !important;
+        position: static !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-family: 'Courier New', Courier, Consolas, monospace !important;
+    }
+
+    /* Hide standard UI elements during print */
+    .no-print,
+    #sidebar,
+    #sidebarBackdrop,
+    header,
+    .invoice-card,
+    #toast,
+    #orderDetailsModal,
+    main {
         display: none !important;
     }
 
-    body {
-        background: #ffffff !important;
-        color: #000000 !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-
-    .invoice-card {
-        box-shadow: none !important;
-        border: none !important;
+    /* Display Thermal Receipt in compact slip format */
+    #thermalReceiptContainer {
+        display: block !important;
+        visibility: visible !important;
+        position: static !important;
         width: 100% !important;
-        max-width: 100% !important;
+        max-width: 280px !important;
+        margin: 0 auto !important;
+        padding: 12px 8px !important;
+        color: #000000 !important;
+        background: #ffffff !important;
+        font-family: 'Courier New', Courier, Consolas, monospace !important;
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+        box-sizing: border-box !important;
     }
 
-    input, select {
-        border: none !important;
-        background: transparent !important;
-        appearance: none;
-        -webkit-appearance: none;
-        padding: 0 !important;
+    .receipt-container {
+        width: 100% !important;
+    }
+
+    .receipt-header {
+        text-align: center !important;
+        margin-bottom: 4px !important;
+    }
+
+    .receipt-brand {
+        font-size: 16px !important;
+        font-weight: bold !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+    }
+
+    .receipt-divider {
+        text-align: center !important;
+        letter-spacing: -1px !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        margin: 6px 0 !important;
+        font-weight: bold !important;
+    }
+
+    .receipt-items-list {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+        margin: 6px 0 !important;
+    }
+
+    .receipt-item {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 2px !important;
+    }
+
+    .receipt-row {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100% !important;
+    }
+
+    .receipt-row-top {
+        font-weight: bold !important;
+        font-size: 14px !important;
+    }
+
+    .receipt-item-name {
+        text-align: left !important;
+        word-break: break-word !important;
+    }
+
+    .receipt-item-qty {
+        text-align: right !important;
+        font-weight: bold !important;
+        margin-left: 8px !important;
+    }
+
+    .receipt-row-bottom {
+        font-size: 14px !important;
+    }
+
+    .receipt-item-calc {
+        text-align: left !important;
+    }
+
+    .receipt-item-total {
+        text-align: right !important;
+        font-weight: bold !important;
+    }
+
+    .receipt-summary-list {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 4px !important;
+        margin: 4px 0 !important;
+    }
+
+    .receipt-total-row {
+        font-size: 15px !important;
+        font-weight: bold !important;
+        margin-top: 2px !important;
+    }
+
+    .receipt-footer {
+        text-align: center !important;
+        font-weight: bold !important;
+        font-size: 14px !important;
+        margin-top: 8px !important;
     }
 }
+

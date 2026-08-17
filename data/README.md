@@ -1,4 +1,7 @@
-# Data Directory Placeholder
+# Data & Database Architecture
 
-This directory is reserved for future server-side JSON files / API integration.
-For the current frontend-only prototype, all data operations are handled dynamically using browser LocalStorage.
+All data operations are handled live via **Core PHP (PDO)** and **MySQL database** (`cakeshop_db` / `phpmyadmin`).
+- Database schema: `database/schema.sql`
+- Initial seed data: `database/seed.sql`
+- Database config & security: `config/db.php`
+- Live APIs: `api/auth.php`, `api/settings.php`, `api/products.php`, `api/orders.php`, `api/dashboard.php`

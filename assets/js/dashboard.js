@@ -1,41 +1,12 @@
 /**
  * dashboard.js
- * Dashboard statistics calculations and Top 10 order queries
+ * Dashboard statistics calculations and Top 10 order queries via Live Core PHP API
  */
 
 window.CakeDashboard = (function () {
 
     function formatMoney(amount) {
-        return new Intl.NumberFormat('en-IN', {
-            style: 'currency',
-            currency: 'INR',
-            minimumFractionDigits: 2
-        }).format(amount || 0);
-    }
-
-    // Check if a date string falls in the current week (Monday to Sunday)
-    function isCurrentWeek(dateStr) {
-        const d = new Date(dateStr);
-        const now = new Date();
-
-        // Get Monday of current week
-        const dayOfWeek = now.getDay();
-        const diffToMonday = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-        const monday = new Date(now.setDate(diffToMonday));
-        monday.setHours(0, 0, 0, 0);
-
-        const sunday = new Date(monday);
-        sunday.setDate(sunday.getDate() + 6);
-        sunday.setHours(23, 59, 59, 999);
-
-        return d >= monday && d <= sunday;
-    }
-
-    // Check if a date string falls in the current month
-    function isCurrentMonth(dateStr) {
-        const d = new Date(dateStr);
-        const now = new Date();
-        return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+        return CakeApi.formatMoney(amount);
     }
 
     function renderEmptyState(targetId, message = 'No orders found.') {
@@ -58,23 +29,22 @@ window.CakeDashboard = (function () {
         }
 
         const html = ordersArr.map(order => {
-            const itemsSummary = order.items && order.items.length > 0
-                ? order.items.map(i => `${i.cake_name} (${i.qty})`).join(', ')
-                : 'N/A';
-
+            const itemsSummary = order.items_summary || 'N/A';
             const truncatedSummary = itemsSummary.length > 35
                 ? itemsSummary.substring(0, 35) + '...'
                 : itemsSummary;
 
+            const orderNum = order.order_number || order.order_id;
+
             return `
                 <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                    <td class="py-2.5 px-3 font-mono font-bold text-rose-600">${order.order_id}</td>
+                    <td class="py-2.5 px-3 font-mono font-bold text-rose-600">${orderNum}</td>
                     <td class="py-2.5 px-3 text-slate-500">${order.order_date}</td>
                     <td class="py-2.5 px-3 text-slate-700 font-medium" title="${itemsSummary}">${truncatedSummary}</td>
                     <td class="py-2.5 px-3 text-center font-bold text-slate-800">${order.total_qty || 0}</td>
-                    <td class="py-2.5 px-3 text-right font-bold text-slate-900">${formatMoney(order.grand_total || order.subtotal)}</td>
+                    <td class="py-2.5 px-3 text-right font-bold text-slate-900">${formatMoney(order.grand_total)}</td>
                     <td class="py-2.5 px-3 text-center">
-                        <button type="button" class="view-order-btn px-2.5 py-1 text-[11px] font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-md transition" data-id="${order.order_id}">
+                        <button type="button" class="view-order-btn px-2.5 py-1 text-[11px] font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-md transition" data-id="${order.id || orderNum}">
                             <i class="fa-solid fa-eye"></i> View
                         </button>
                     </td>
@@ -85,45 +55,32 @@ window.CakeDashboard = (function () {
         $(`#${targetId}`).html(html);
     }
 
-    function init() {
-        const todayStr = CakeStorage.formatDateStr();
+    async function init() {
+        const todayStr = CakeApi.formatDateStr();
         $('#currentDateBadge').text(todayStr);
 
-        const allOrders = CakeStorage.getAllOrders();
+        // Show loading spinners in cards
+        $('#statTodayOrders, #statWeekOrders, #statMonthOrders').html('<i class="fa-solid fa-spinner fa-spin text-slate-400 text-sm"></i>');
+        $('#statTodayEarnings, #statWeekEarnings, #statMonthEarnings').html('<i class="fa-solid fa-spinner fa-spin text-slate-400 text-sm"></i>');
 
-        // Filter Today Orders
-        const todayOrders = allOrders.filter(o => o.order_date === todayStr);
-        const todayEarnings = todayOrders.reduce((sum, o) => sum + (o.grand_total || o.subtotal || 0), 0);
+        const res = await CakeApi.dashboard.getMetrics();
 
-        // Filter Week Orders
-        const weekOrders = allOrders.filter(o => isCurrentWeek(o.order_date));
-        const weekEarnings = weekOrders.reduce((sum, o) => sum + (o.grand_total || o.subtotal || 0), 0);
+        if (res.success && res.metrics) {
+            const m = res.metrics;
+            $('#statTodayOrders').text(m.today_orders);
+            $('#statTodayEarnings').text(formatMoney(m.today_earnings));
 
-        // Filter Month Orders
-        const monthOrders = allOrders.filter(o => isCurrentMonth(o.order_date));
-        const monthEarnings = monthOrders.reduce((sum, o) => sum + (o.grand_total || o.subtotal || 0), 0);
+            $('#statWeekOrders').text(m.week_orders);
+            $('#statWeekEarnings').text(formatMoney(m.week_earnings));
 
-        // Update Stat Cards
-        $('#statTodayOrders').text(todayOrders.length);
-        $('#statTodayEarnings').text(formatMoney(todayEarnings));
+            $('#statMonthOrders').text(m.month_orders);
+            $('#statMonthEarnings').text(formatMoney(m.month_earnings));
 
-        $('#statWeekOrders').text(weekOrders.length);
-        $('#statWeekEarnings').text(formatMoney(weekEarnings));
-
-        $('#statMonthOrders').text(monthOrders.length);
-        $('#statMonthEarnings').text(formatMoney(monthEarnings));
-
-        // Render Today's Top 10 Orders (sorted by subtotal DESC)
-        const todayTop10 = [...todayOrders]
-            .sort((a, b) => (b.grand_total || b.subtotal) - (a.grand_total || a.subtotal))
-            .slice(0, 10);
-        renderTableRows('todayTopTable', todayTop10);
-
-        // Render Current Month Top 10 Orders (sorted by subtotal DESC)
-        const monthTop10 = [...monthOrders]
-            .sort((a, b) => (b.grand_total || b.subtotal) - (a.grand_total || a.subtotal))
-            .slice(0, 10);
-        renderTableRows('monthTopTable', monthTop10);
+            renderTableRows('todayTopTable', res.today_top_orders || []);
+            renderTableRows('monthTopTable', res.month_top_orders || []);
+        } else {
+            console.error('Failed to load dashboard metrics:', res.message);
+        }
 
         // Delegate View Order Modal Click
         $(document).off('click', '.view-order-btn').on('click', '.view-order-btn', function () {
