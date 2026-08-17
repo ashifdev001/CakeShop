@@ -165,6 +165,23 @@
                         </select>
                     </div>
 
+                    <!-- Payment Method Toggle -->
+                    <div class="pt-2 border-t border-slate-200">
+                        <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Payment Method</div>
+                        <div class="grid grid-cols-2 gap-2" id="paymentTypeContainer">
+                            <label class="payment-type-label flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg border-2 border-rose-600 bg-rose-50/70 text-rose-700 font-bold text-xs cursor-pointer transition select-none shadow-xs" data-type="cash">
+                                <input type="radio" name="paymentType" value="cash" checked class="hidden">
+                                <i class="fa-solid fa-money-bill-wave text-xs"></i>
+                                <span>Cash</span>
+                            </label>
+                            <label class="payment-type-label flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg border border-slate-300 bg-white text-slate-600 font-semibold text-xs cursor-pointer hover:border-slate-400 transition select-none" data-type="online">
+                                <input type="radio" name="paymentType" value="online" class="hidden">
+                                <i class="fa-solid fa-qrcode text-xs"></i>
+                                <span>Online / UPI</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <div class="border-t border-slate-200 my-1 pt-2 flex justify-between items-center text-slate-900">
                         <span class="font-bold text-sm">Grand Total</span>
                         <span id="grandTotal" class="font-display font-bold text-lg text-rose-600">₹0.00</span>

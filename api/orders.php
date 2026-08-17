@@ -93,6 +93,11 @@ switch ($action) {
         $taxAmount = round($subAfterDiscount * ($taxRate / 100), 2);
         $grandTotal = round($subAfterDiscount + $taxAmount, 2);
 
+        $paymentType = strtolower(cleanString($input['payment_type'] ?? 'cash'));
+        if (!in_array($paymentType, ['cash', 'online'])) {
+            $paymentType = 'cash';
+        }
+
         try {
             $pdo->beginTransaction();
 
@@ -102,10 +107,10 @@ switch ($action) {
             $stmtOrder = $pdo->prepare("
                 INSERT INTO orders (
                     order_number, order_date, order_time, customer_name, customer_phone,
-                    total_items, total_qty, subtotal, discount, tax_rate, tax_amount, grand_total, status
+                    total_items, total_qty, subtotal, discount, tax_rate, tax_amount, grand_total, payment_type, status
                 ) VALUES (
                     :order_number, :order_date, :order_time, :customer_name, :customer_phone,
-                    :total_items, :total_qty, :subtotal, :discount, :tax_rate, :tax_amount, :grand_total, 'completed'
+                    :total_items, :total_qty, :subtotal, :discount, :tax_rate, :tax_amount, :grand_total, :payment_type, 'completed'
                 )
             ");
 
@@ -121,7 +126,8 @@ switch ($action) {
                 ':discount' => $discount,
                 ':tax_rate' => $taxRate,
                 ':tax_amount' => $taxAmount,
-                ':grand_total' => $grandTotal
+                ':grand_total' => $grandTotal,
+                ':payment_type' => $paymentType
             ]);
 
             $orderId = $pdo->lastInsertId();
@@ -163,6 +169,7 @@ switch ($action) {
                     'tax_rate' => $taxRate,
                     'tax_amount' => $taxAmount,
                     'grand_total' => $grandTotal,
+                    'payment_type' => $paymentType,
                     'items' => $cleanItems
                 ]
             ], 201);
@@ -252,6 +259,7 @@ switch ($action) {
                     o.tax_rate,
                     o.tax_amount,
                     o.grand_total,
+                    o.payment_type,
                     o.status,
                     o.created_at
                 FROM orders o
@@ -296,7 +304,7 @@ switch ($action) {
                 SELECT
                     id, order_number, order_number AS order_id, order_date, order_time,
                     customer_name, customer_phone, total_items, total_qty,
-                    subtotal, discount, tax_rate, tax_amount, grand_total, status, created_at
+                    subtotal, discount, tax_rate, tax_amount, grand_total, payment_type, status, created_at
                 FROM orders
                 WHERE id = :id_num OR order_number = :ord_num
                 LIMIT 1

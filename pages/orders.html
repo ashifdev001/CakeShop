@@ -87,6 +87,7 @@
                         <th class="py-3 px-4">Order ID</th>
                         <th class="py-3 px-4">Date</th>
                         <th class="py-3 px-4">Time</th>
+                        <th class="py-3 px-4 text-center">Payment</th>
                         <th class="py-3 px-4 text-center">Total Items</th>
                         <th class="py-3 px-4 text-center">Total Qty</th>
                         <th class="py-3 px-4 text-right">Total Amount</th>
@@ -142,15 +143,15 @@
         <!-- Modal Body -->
         <div class="p-5 space-y-4 max-h-[70vh] overflow-y-auto text-xs">
 
-            <!-- Customer Info Badge -->
-            <div class="bg-rose-50/70 border border-rose-100 rounded-xl p-3 flex justify-between text-slate-700">
+            <!-- Customer & Payment Info Badge -->
+            <div class="bg-rose-50/70 border border-rose-100 rounded-xl p-3 flex justify-between items-center text-slate-700">
                 <div>
                     <span class="text-slate-400 text-[11px] uppercase font-bold block">Customer Name</span>
                     <span id="modalCustName" class="font-bold text-slate-900"></span>
                 </div>
                 <div class="text-right">
-                    <span class="text-slate-400 text-[11px] uppercase font-bold block">Phone</span>
-                    <span id="modalCustPhone" class="font-mono text-slate-800"></span>
+                    <span class="text-slate-400 text-[11px] uppercase font-bold block">Payment Mode</span>
+                    <span id="modalPaymentType" class="font-bold"></span>
                 </div>
             </div>
 

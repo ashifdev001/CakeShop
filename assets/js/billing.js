@@ -233,6 +233,8 @@ window.CakeBilling = (function () {
             </div>
         `).join('');
 
+        const payMode = ((orderData ? orderData.payment_type : getSelectedPaymentType()) || 'cash').toUpperCase();
+
         return `
             <div class="receipt-container">
                 <div class="receipt-header">
@@ -242,9 +244,13 @@ window.CakeBilling = (function () {
                     <div style="font-size: 10px; margin-top: 2px; color: #555;">Ph: ${cachedSettings.phone}</div>
                 </div>
                 <div class="receipt-divider">----------------------------</div>
-                <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
+                <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:2px;">
                     <span>Inv: ${orderNumber}</span>
                     <span>Date: ${orderDate}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
+                    <span>Pay Mode: ${payMode}</span>
+                    <span>Status: Paid</span>
                 </div>
                 <div class="receipt-divider">----------------------------</div>
                 <div class="receipt-items-list">
@@ -253,7 +259,7 @@ window.CakeBilling = (function () {
                 <div class="receipt-divider">----------------------------</div>
                 <div class="receipt-summary-list">
                     <div class="receipt-row receipt-total-row">
-                        <span>TOTAL</span>
+                        <span>TOTAL (${payMode})</span>
                         <span>${formatReceiptMoney(grandTotal)}</span>
                     </div>
                 </div>
@@ -344,9 +350,24 @@ window.CakeBilling = (function () {
         }, 250);
     }
 
+    function getSelectedPaymentType() {
+        return $('input[name="paymentType"]:checked').val() || 'cash';
+    }
+
+    function updatePaymentTypeUI(type = 'cash') {
+        $(`input[name="paymentType"][value="${type}"]`).prop('checked', true);
+        $('.payment-type-label')
+            .removeClass('border-2 border-rose-600 bg-rose-50/70 text-rose-700 font-bold shadow-xs')
+            .addClass('border border-slate-300 bg-white text-slate-600 font-semibold');
+        $(`.payment-type-label[data-type="${type}"]`)
+            .removeClass('border border-slate-300 bg-white text-slate-600 font-semibold')
+            .addClass('border-2 border-rose-600 bg-rose-50/70 text-rose-700 font-bold shadow-xs');
+    }
+
     function resetBillingForm() {
         $('#discountInput').val(0);
         $('#taxSelect').val(cachedSettings.tax_rate || 5);
+        updatePaymentTypeUI('cash');
 
         // Keep only first row
         $('.item-row:gt(0)').remove();
@@ -414,6 +435,7 @@ window.CakeBilling = (function () {
         const custName = 'Walk-in Customer';
         const custPhone = '';
         const dateStr = $('#invoiceDate').val() || CakeApi.formatDateStr();
+        const payType = getSelectedPaymentType();
 
         const orderPayload = {
             order_date: dateStr,
@@ -425,7 +447,8 @@ window.CakeBilling = (function () {
             discount: totals.discount,
             tax_rate: totals.taxRate,
             tax_amount: totals.taxAmount,
-            grand_total: totals.grandTotal
+            grand_total: totals.grandTotal,
+            payment_type: payType
         };
 
         const saveBtn = $('#saveOrderBtn');
@@ -436,9 +459,9 @@ window.CakeBilling = (function () {
 
             if (res.success && res.order) {
                 if (window.CakeApp && typeof window.CakeApp.showToast === 'function') {
-                    window.CakeApp.showToast(`Order ${res.order.order_number} saved successfully!`, 'success');
+                    window.CakeApp.showToast(`Order ${res.order.order_number} saved (${payType.toUpperCase()})!`, 'success');
                 } else {
-                    alert(`Order ${res.order.order_number} saved successfully!`);
+                    alert(`Order ${res.order.order_number} saved (${payType.toUpperCase()})!`);
                 }
 
                 resetBillingForm();
@@ -463,6 +486,13 @@ window.CakeBilling = (function () {
         loadSettings();
         loadProducts();
         refreshPreviewOrderId();
+        updatePaymentTypeUI('cash');
+
+        // Payment Method Click Toggle
+        $(document).off('click', '.payment-type-label').on('click', '.payment-type-label', function () {
+            const type = $(this).data('type') || 'cash';
+            updatePaymentTypeUI(type);
+        });
 
         let searchDebounce = null;
 

@@ -26,14 +26,22 @@ window.CakeOrders = (function () {
         $('#modalOrderId').text(order.order_number || order.order_id);
         $('#modalOrderDateTime').text(`${order.order_date} at ${order.order_time || 'N/A'}`);
         $('#modalCustName').text(order.customer_name || 'Walk-in Customer');
-        $('#modalCustPhone').text(order.customer_phone || 'N/A');
+        const custPhone = order.customer_phone ? order.customer_phone : 'N/A';
+        $('#modalCustPhone').text(custPhone);
 
-        // Items body
-        const itemsHtml = (order.items || []).map(item => `
-            <tr class="border-b border-slate-100 hover:bg-slate-50">
+        const payType = (order.payment_type || 'cash').toLowerCase();
+        if (payType === 'online') {
+            $('#modalPaymentType').html('<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200"><i class="fa-solid fa-qrcode text-[10px]"></i> Online / UPI</span>');
+        } else {
+            $('#modalPaymentType').html('<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-money-bill-wave text-[10px]"></i> Cash</span>');
+        }
+
+        const items = order.items || [];
+        const itemsHtml = items.map(item => `
+            <tr class="hover:bg-slate-50 transition">
                 <td class="py-2.5 px-3 font-semibold text-slate-800">${item.cake_name}</td>
                 <td class="py-2.5 px-3 text-right text-slate-600">${formatMoney(item.price)}</td>
-                <td class="py-2.5 px-3 text-center font-bold text-slate-800">${item.qty}</td>
+                <td class="py-2.5 px-3 text-center font-bold text-slate-700">${item.qty}</td>
                 <td class="py-2.5 px-3 text-right font-bold text-slate-900">${formatMoney(item.total)}</td>
             </tr>
         `).join('');
@@ -77,7 +85,7 @@ window.CakeOrders = (function () {
 
         $('#ordersTableBody').html(`
             <tr>
-                <td colspan="8" class="py-8 text-center text-slate-400">
+                <td colspan="9" class="py-8 text-center text-slate-400">
                     <div class="flex items-center justify-center gap-2">
                         <i class="fa-solid fa-spinner fa-spin text-rose-500 text-lg"></i>
                         <span class="text-xs">Loading orders from server...</span>
@@ -98,7 +106,7 @@ window.CakeOrders = (function () {
         if (!res.success) {
             $('#ordersTableBody').html(`
                 <tr>
-                    <td colspan="8" class="py-8 text-center text-red-500 text-xs">
+                    <td colspan="9" class="py-8 text-center text-red-500 text-xs">
                         Failed to load orders: ${res.message || 'Server error'}
                     </td>
                 </tr>
@@ -115,7 +123,7 @@ window.CakeOrders = (function () {
         if (orders.length === 0) {
             $('#ordersTableBody').html(`
                 <tr>
-                    <td colspan="8" class="py-12 text-center text-slate-400">
+                    <td colspan="9" class="py-12 text-center text-slate-400">
                         <div class="flex flex-col items-center justify-center gap-2">
                             <i class="fa-solid fa-folder-open text-3xl text-slate-300"></i>
                             <span class="text-xs font-semibold">No orders matched your search or filter criteria.</span>
@@ -135,12 +143,18 @@ window.CakeOrders = (function () {
         const rowsHtml = orders.map((order, idx) => {
             const slNo = startIndex + idx + 1;
             const orderNum = order.order_number || order.order_id;
+            const payType = (order.payment_type || 'cash').toLowerCase();
+            const payBadge = payType === 'online'
+                ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200"><i class="fa-solid fa-qrcode text-[9px]"></i> Online</span>`
+                : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-money-bill-wave text-[9px]"></i> Cash</span>`;
+
             return `
                 <tr class="hover:bg-slate-50 transition border-b border-slate-100">
                     <td class="py-3 px-4 text-center font-bold text-slate-400">${slNo}</td>
                     <td class="py-3 px-4 font-mono font-bold text-rose-600">${orderNum}</td>
                     <td class="py-3 px-4 text-slate-700">${order.order_date}</td>
                     <td class="py-3 px-4 text-slate-500 font-mono">${order.order_time || 'N/A'}</td>
+                    <td class="py-3 px-4 text-center">${payBadge}</td>
                     <td class="py-3 px-4 text-center font-bold text-slate-800">${order.total_items}</td>
                     <td class="py-3 px-4 text-center font-bold text-slate-800">${order.total_qty}</td>
                     <td class="py-3 px-4 text-right font-bold text-slate-900">${formatMoney(order.grand_total || order.subtotal)}</td>

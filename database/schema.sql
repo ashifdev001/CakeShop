@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS `orders` (
     `tax_rate` DECIMAL(5, 2) NOT NULL DEFAULT 5.00,
     `tax_amount` DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     `grand_total` DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    `payment_type` ENUM('cash', 'online') NOT NULL DEFAULT 'cash',
     `status` ENUM('completed', 'cancelled') NOT NULL DEFAULT 'completed',
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX `idx_order_date` (`order_date`),

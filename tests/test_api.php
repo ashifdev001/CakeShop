@@ -70,15 +70,15 @@ $stmtCount->execute([':d' => $today]);
 $currentCount = intval($stmtCount->fetchColumn());
 $expectedNextNum = "ORD-{$cleanDate}-" . str_pad($currentCount + 1, 4, '0', STR_PAD_LEFT);
 
-// Insert test order
+// Insert test order with online payment_type
 $pdo->beginTransaction();
 $stmtIns = $pdo->prepare("
     INSERT INTO orders (
         order_number, order_date, order_time, customer_name, customer_phone,
-        total_items, total_qty, subtotal, discount, tax_rate, tax_amount, grand_total, status
+        total_items, total_qty, subtotal, discount, tax_rate, tax_amount, grand_total, payment_type, status
     ) VALUES (
         :order_number, :order_date, :order_time, :customer_name, :customer_phone,
-        :total_items, :total_qty, :subtotal, :discount, :tax_rate, :tax_amount, :grand_total, 'completed'
+        :total_items, :total_qty, :subtotal, :discount, :tax_rate, :tax_amount, :grand_total, :payment_type, 'completed'
     )
 ");
 $stmtIns->execute([
@@ -93,7 +93,8 @@ $stmtIns->execute([
     ':discount' => 0.00,
     ':tax_rate' => 5.00,
     ':tax_amount' => 25.00,
-    ':grand_total' => 525.00
+    ':grand_total' => 525.00,
+    ':payment_type' => 'online'
 ]);
 $orderId = $pdo->lastInsertId();
 
@@ -102,6 +103,10 @@ $stmtItem->execute([$orderId, 'Automated Test Cake', 250.00, 2, 500.00]);
 $pdo->commit();
 
 assertTest("Order created with ID: $expectedNextNum", $orderId > 0);
+
+// Verify payment_type in stored order
+$savedPayType = $pdo->query("SELECT payment_type FROM orders WHERE id = $orderId")->fetchColumn();
+assertTest("Payment type stored as 'online'", $savedPayType === 'online');
 
 // 6. Test Foreign Key Constraint Cascade
 $orderItems = $pdo->query("SELECT * FROM order_items WHERE order_id = $orderId")->fetchAll();
